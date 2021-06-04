@@ -31,23 +31,17 @@ RUN apk add --no-cache \
 	shared-mime-info
 
 ## Install Bundler
-RUN gem install bundler -v 1.17.3
+RUN gem install bundler -v 2.2.19
 
 ## Create Workdir
 RUN mkdir -p /app
 WORKDIR /app
 
 ## Move Assets
-COPY ["Gemfile", "/app/"]
-COPY lib/gemfile_helper.rb /app/lib/
-COPY vendor/gems/ /app/vendor/gems/
-
-## Bundle Update
-#RUN RAILS_ENV=production APP_SECRET_TOKEN=secret DATABASE_ADAPTER=mysql2 ON_HEROKU=true bundle update --source mimemagic
-
-## Install correct v8
-RUN gem install libv8 -v '~> 7.3'
+COPY src/Gemfile /app/
+COPY src/lib/gemfile_helper.rb /app/lib/
+COPY src/vendor/gems/ /app/vendor/gems/
+COPY Gemfile.lock /app/
 
 ## Bundle Install
 RUN RAILS_ENV=production APP_SECRET_TOKEN=secret DATABASE_ADAPTER=mysql2 ON_HEROKU=true bundle install --without test development --path vendor/bundle -j $(nproc)
-RUN cat Gemfile.lock
